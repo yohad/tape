@@ -1,9 +1,13 @@
+{-# LANGUAGE CPP #-}
 module Tape.Win32 where
 
 import System.Win32.Types
 import Foreign.C.String
 import Foreign
 import System.Win32.DebugApi
+
+-- In Win32 the max is 512, So I think it is safe enough
+#define MAX_FILE_PATH (1024)
 
 foreign import ccall "CreateDebuggedProcess"
     c_CreateDebuggedProcess :: LPCSTR -> IO PHANDLE
@@ -12,15 +16,10 @@ foreign import ccall "windows.h GetModuleFileNameA"
     c_GetModuleFileNameA :: HANDLE -> LPSTR -> DWORD -> IO DWORD
 
 getModuleFileName :: HANDLE -> IO (Maybe String)
-getModuleFileName moduleHandle = do
-    let bufferSize = 2048 :: Int -- plenty, PATH_MAX is 512 under Win32.
-    buffer <- mallocArray bufferSize
-    returnValue <- c_GetModuleFileNameA moduleHandle buffer $ fromIntegral bufferSize
+getModuleFileName moduleHandle = allocaBytes MAX_FILE_PATH $ \buffer -> do
+    returnValue <- c_GetModuleFileNameA moduleHandle buffer $ fromIntegral MAX_FILE_PATH
     if 0 == returnValue
-        then do
-            lastError <- c_GetLastError
-            print lastError
-            return Nothing
+        then return Nothing
         else Just `fmap` peekCString buffer
 
 foreign import ccall "GetLastError"
@@ -30,10 +29,8 @@ foreign import ccall "GetFinalPathNameByHandleA"
     c_GetFinalPathNameByHandleA :: HANDLE -> LPSTR -> DWORD -> DWORD -> IO DWORD
 
 getFinalPathNameByHandle :: HANDLE -> IO (Maybe String)
-getFinalPathNameByHandle fileHandle = allocaBytes bufferSize $ \buffer -> do
-    returnValue <- c_GetFinalPathNameByHandleA fileHandle buffer (fromIntegral bufferSize) 0
+getFinalPathNameByHandle fileHandle = allocaBytes MAX_FILE_PATH $ \buffer -> do
+    returnValue <- c_GetFinalPathNameByHandleA fileHandle buffer (fromIntegral MAX_FILE_PATH) 0
     if 0 == returnValue
         then return Nothing
         else Just `fmap` peekCString buffer
-    where 
-        bufferSize = 2048  
