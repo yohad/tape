@@ -1,4 +1,7 @@
 #include <Windows.h>
+#include <psapi.h>
+
+#define FILENAME_MAX_LENGTH (100)
 
 HANDLE CreateDebuggedProcess(LPCSTR lpApplicationName)
 {
