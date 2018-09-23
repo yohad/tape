@@ -24,6 +24,9 @@ dependencies:
 - Win32
 - mtl == 2.2.1
 - transformers == 0.5.5.0
+- containers == 0.5.11.0
+- parsec == 3.1.13.0
+- lens == 4.17
 
 library:
   source-dirs: src

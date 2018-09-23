@@ -41,6 +41,8 @@ packages:
 extra-deps:
 - mtl-2.2.1
 - transformers-0.5.5.0
+- containers-0.5.11.0
+- lens-4.17
 
 # Override default flag values for local packages and extra-deps
 # flags: {}

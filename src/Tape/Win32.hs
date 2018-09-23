@@ -7,10 +7,10 @@ import Foreign
 import System.Win32.DebugApi
 
 -- In Win32 the max is 512, So I think it is safe enough
-#define MAX_FILE_PATH (1024)
+#define MAX_FILE_PATH (2048)
 
 foreign import ccall "CreateDebuggedProcess"
-    c_CreateDebuggedProcess :: LPCSTR -> IO PHANDLE
+    c_CreateDebuggedProcess :: LPCSTR -> IO HANDLE
 
 foreign import ccall "windows.h GetModuleFileNameA"
     c_GetModuleFileNameA :: HANDLE -> LPSTR -> DWORD -> IO DWORD
